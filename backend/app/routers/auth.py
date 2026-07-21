@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.auth import LoginRequest, Token
 from app.services.auth_service import autenticar_usuario
+from fastapi.security import OAuth2PasswordRequestForm
 
 
 router = APIRouter(
@@ -13,13 +14,13 @@ router = APIRouter(
 
 @router.post("/login", response_model=Token)
 def login(
-    datos: LoginRequest,
+    form_data: OAuth2PasswordRequestForm = Depends(),
     db: Session = Depends(get_db)
 ):
     access_token = autenticar_usuario(
         db,
-        datos.username,
-        datos.password
+        form_data.username,
+        form_data.password
     )
 
     if not access_token:
